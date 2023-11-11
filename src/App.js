@@ -2,6 +2,7 @@ import { useState } from 'react';
 import './App.css';
 import classNames from 'classnames';
 
+
 function App() {
   const [nationalities, setNationalities] = useState([]);
   const [message, setMessage] = useState('');
@@ -11,7 +12,14 @@ function App() {
   async function fetchNationalities() {
     let errorInFetch = false;
     try {
-      const data = await (await fetch(`https://api.nationalize.io/?name=${personName}`)).json();
+      const fetchObject={
+        method:"GET",
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      }
+
+      const data = await (await fetch(`https://api.nationalize.io/?name=${personName}`,fetchObject)).json();
       const hasCountryData = data.country && data.country.length
       const nationalities =  hasCountryData ? data.country : [];
       setNationalities(nationalities);
@@ -44,13 +52,14 @@ function App() {
         <div className="title-form">
           <h2>Check Name's Nationalities percent</h2>
           <div style={{ marginBottom: '20px' }}>
-            <form name="nationalities-form" onSubmit={handleSubmit}>
+            <form name="nationalities-form" onSubmit={handleSubmit} >
               <input
                 name="personName"
                 type="text"
                 onChange={(e) => setPersonName(e.target.value)}
                 value={personName}
                 placeholder="Enter a person's name"
+                aria-label="Person's Name"
               />
               <button onClick={handleSubmit}>Get Nationalities</button>
             </form>
@@ -58,7 +67,7 @@ function App() {
         </div>
         <div className="results">
           <div className={messageClassNames}>{message}</div>
-          <div className="nationalities">
+          <div className="nationalities" aria-label="List of Nationalities">
             {Array.isArray(nationalities) && nationalities.map(
               nationality => {
                 const flagUrl = `https://flagcdn.com/w160/${nationality.country_id.toLowerCase()}.jpg`;
